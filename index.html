@@ -1,1 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClassCharts-Inspired Animated Dashboard</title>
+    <style>
+      :root {
+        --bg: #070b18;
+        --bg-soft: #101735;
+        --panel: rgba(255, 255, 255, 0.08);
+        --panel-2: rgba(255, 255, 255, 0.12);
+        --text: #f3f6ff;
+        --muted: #aeb6d9;
+        --green: #3ee89a;
+        --amber: #ffcf6c;
+        --red: #ff6d88;
+        --blue: #5ea8ff;
+        --violet: #9a7dff;
+        --shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+      }
 
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(1200px 500px at 90% -20%, rgba(154, 125, 255, 0.2), transparent 60%),
+          radial-gradient(1000px 500px at -10% 110%, rgba(94, 168, 255, 0.25), transparent 55%),
+          var(--bg);
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        padding: 28px 20px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent);
+        backdrop-filter: blur(12px);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+
+      .brand-badge {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--blue), var(--violet));
+        box-shadow: 0 10px 25px rgba(154, 125, 255, 0.5);
+      }
+
+      .brand h1 {
+        font-size: 1rem;
+        line-height: 1.2;
+        margin: 0;
+      }
+
+      .brand small {
+        color: var(--muted);
+      }
+
+      .menu {
+        display: grid;
+        gap: 10px;
+      }
+
+      .menu button {
+        all: unset;
+        cursor: pointer;
+        padding: 12px 14px;
+        border-radius: 12px;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        transition: 0.25s ease;
+      }
+
+      .menu button.active,
+      .menu button:hover {
+        background: var(--panel-2);
+        color: var(--text);
+        transform: translateX(4px);
+      }
+
+      main {
+        padding: 24px;
+        display: grid;
+        grid-template-rows: auto auto 1fr;
+        gap: 20px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+
+      .title h2 {
+        margin: 0;
+        font-size: 1.35rem;
+      }
+
+      .title p {
+        margin: 4px 0 0;
+        color: var(--muted);
+      }
+
+      .pulse {
+        padding: 10px 14px;
+        border: 1px solid rgba(62, 232, 154, 0.5);
+        border-radius: 999px;
+        color: #bafad9;
+        background: rgba(62, 232, 154, 0.12);
+        position: relative;
+      }
+
+      .pulse::after {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border: 2px solid rgba(62, 232, 154, 0.3);
+        border-radius: inherit;
+        animation: ping 2s infinite;
+      }
+
+      @keyframes ping {
+        from {
+          transform: scale(1);
+          opacity: 1;
+        }
+        to {
+          transform: scale(1.15);
+          opacity: 0;
+        }
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 14px;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .metric {
+        font-size: 1.65rem;
+        margin: 8px 0 0;
+        font-weight: 700;
+      }
+
+      .card small {
+        color: var(--muted);
+      }
+
+      .dashboard {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 14px;
+      }
+
+      .seating-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(110px, 1fr));
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .student {
+        padding: 12px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        transition: transform 0.25s ease, border-color 0.25s ease;
+        animation: float 4s ease-in-out infinite;
+      }
+
+      .student:nth-child(odd) {
+        animation-delay: 0.6s;
+      }
+
+      .student:hover {
+        transform: translateY(-4px) scale(1.02);
+        border-color: rgba(94, 168, 255, 0.6);
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-3px);
+        }
+      }
+
+      .tag {
+        font-size: 0.72rem;
+        color: #061426;
+        padding: 4px 8px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-top: 8px;
+        font-weight: 700;
+      }
+
+      .excellent {
+        background: var(--green);
+      }
+
+      .focus {
+        background: var(--amber);
+      }
+
+      .support {
+        background: var(--red);
+        color: white;
+      }
+
+      .timeline {
+        margin-top: 10px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .event {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .event .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin: 0 auto;
+      }
+
+      .chart {
+        margin-top: 16px;
+        height: 170px;
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+      }
+
+      .bar {
+        flex: 1;
+        border-radius: 8px 8px 4px 4px;
+        background: linear-gradient(180deg, rgba(94, 168, 255, 0.95), rgba(154, 125, 255, 0.9));
+        transform-origin: bottom;
+        animation: grow 1.2s ease forwards;
+      }
+
+      @keyframes grow {
+        from {
+          transform: scaleY(0.1);
+          opacity: 0.5;
+        }
+        to {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 1080px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          border-right: none;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stats,
+        .dashboard {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-badge"></div>
+          <div>
+            <h1>ClassCharts Motion</h1>
+            <small>Animated classroom analytics</small>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <button class="active">Dashboard <span>●</span></button>
+          <button>Seating Plan <span>12</span></button>
+          <button>Behaviour <span>+246</span></button>
+          <button>Homework <span>4 due</span></button>
+          <button>Attendance <span>96%</span></button>
+          <button>Parent View <span>18 msgs</span></button>
+        </nav>
+      </aside>
+
+      <main>
+        <header class="topbar card">
+          <div class="title">
+            <h2>Year 9 Mathematics • Period 3</h2>
+            <p>Live view of rewards, behaviour, and engagement trends.</p>
+          </div>
+          <div class="pulse">Live updates enabled</div>
+        </header>
+
+        <section class="stats">
+          <article class="card">
+            <small>Positive points (today)</small>
+            <p class="metric" style="color: var(--green)">+58</p>
+          </article>
+          <article class="card">
+            <small>Behaviour incidents</small>
+            <p class="metric" style="color: var(--red)">3</p>
+          </article>
+          <article class="card">
+            <small>Attendance this week</small>
+            <p class="metric" style="color: var(--blue)">96.2%</p>
+          </article>
+          <article class="card">
+            <small>Homework completion</small>
+            <p class="metric" style="color: var(--amber)">91%</p>
+          </article>
+        </section>
+
+        <section class="dashboard">
+          <article class="card">
+            <h3 style="margin-top: 0">Interactive Seating Plan</h3>
+            <small>Hover cards for quick pastoral insight.</small>
+            <div class="seating-grid" id="seating"></div>
+          </article>
+
+          <article class="card">
+            <h3 style="margin-top: 0">Behaviour Timeline</h3>
+            <small>Recent activity with animated trend graph.</small>
+            <div class="timeline" id="timeline"></div>
+            <div class="chart" id="chart"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const students = [
+        ["Amelia", "excellent"],
+        ["Leo", "focus"],
+        ["Sophia", "excellent"],
+        ["Noah", "support"],
+        ["Maya", "excellent"],
+        ["Isaac", "focus"],
+        ["Ava", "excellent"],
+        ["Ethan", "focus"],
+        ["Layla", "excellent"],
+        ["Arlo", "support"],
+        ["Isla", "excellent"],
+        ["Jacob", "focus"]
+      ];
+
+      const tags = {
+        excellent: "Excellent",
+        focus: "Refocus",
+        support: "Support"
+      };
+
+      const seatingEl = document.getElementById("seating");
+      students.forEach(([name, state], i) => {
+        const seat = document.createElement("div");
+        seat.className = "student";
+        seat.style.animationDelay = `${(i % 4) * 0.2}s`;
+        seat.innerHTML = `<strong>${name}</strong><br><span class="tag ${state}">${tags[state]}</span>`;
+        seatingEl.appendChild(seat);
+      });
+
+      const events = [
+        ["08:57", "Starter complete: 94% participation", "var(--green)"],
+        ["09:06", "+7 house points awarded", "var(--blue)"],
+        ["09:19", "Low-level disruption logged", "var(--red)"],
+        ["09:28", "Targeted praise restored focus", "var(--amber)"],
+        ["09:39", "Exit ticket average: 8.2/10", "var(--violet)"]
+      ];
+
+      const timelineEl = document.getElementById("timeline");
+      events.forEach(([time, text, color], i) => {
+        const event = document.createElement("div");
+        event.className = "event";
+        event.style.opacity = 0;
+        event.style.transform = "translateX(10px)";
+        event.innerHTML = `
+          <div class="dot" style="background:${color}"></div>
+          <div><small>${time}</small><div>${text}</div></div>
+        `;
+        timelineEl.appendChild(event);
+        setTimeout(() => {
+          event.style.transition = "all .35s ease";
+          event.style.opacity = 1;
+          event.style.transform = "translateX(0)";
+        }, 120 * i);
+      });
+
+      const weeklyBehaviour = [12, 16, 10, 18, 22, 17, 24];
+      const chartEl = document.getElementById("chart");
+      const max = Math.max(...weeklyBehaviour);
+      weeklyBehaviour.forEach((value, i) => {
+        const bar = document.createElement("div");
+        bar.className = "bar";
+        bar.style.height = `${(value / max) * 100}%`;
+        bar.style.animationDelay = `${0.08 * i}s`;
+        bar.title = `Day ${i + 1}: ${value} points`;
+        chartEl.appendChild(bar);
+      });
+    </script>
+  </body>
+</html>
